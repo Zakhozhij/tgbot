@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-
+import datetime
 numbers = 0
 
 bot = telebot.TeleBot("6030598086:AAEHabgyoYxaGH4WbnbC_N9Qw1H-ac3sy2A")
@@ -16,6 +16,7 @@ def start(message):
     but1 = types.KeyboardButton("rational")
     but2 = types.KeyboardButton("complex")
     markup.add(but1,but2)
+    log(message)
     bot.send_message(message.chat.id, f"Выбери ниже", reply_markup=markup)
 
 @bot.message_handler(content_types = ['text'])
@@ -58,7 +59,7 @@ def op_rational(message):
     elif message.text == "целочисленное деление":
         bot.send_message(message.chat.id, f"введи два числа для целочисленного деления через пробел")
         bot.register_next_step_handler(message, operation_6)
-
+    log(message)
 def complexn(message):
     global numbers
     numbers=2
@@ -73,10 +74,10 @@ def complexn(message):
 @bot.message_handler(content_types = ['text'])
 def op_complex(message):
     if message.text == "сумма":
-        bot.send_message(message.chat.id, f"введи два комплексных числа для суммы через пробел (значения комплексного числа разделяйте запятой -1+4j->-1,4j)")
+        bot.send_message(message.chat.id, f"введи два комплексных числа для суммы через пробел")
         bot.register_next_step_handler(message, operation_1)
     elif message.text == "разность":
-        bot.send_message(message.chat.id, f"введи два комплексных числа для разности через пробел (значения комплексного числа разделяйте запятой -1+4j->-1,4j)")
+        bot.send_message(message.chat.id, f"введи два комплексных числа для разности через пробел")
         bot.register_next_step_handler(message, operation_2)
     elif message.text == "деление":
         bot.send_message(message.chat.id, f"введи два комплексных числа для деления через пробел")
@@ -84,7 +85,7 @@ def op_complex(message):
     elif message.text == "умножение":
         bot.send_message(message.chat.id, f"введи два комплексных числа для умножения через пробел")
         bot.register_next_step_handler(message, operation_4)
-
+    log(message)
 def operation_1(message):
     global numbers
     result=''
@@ -96,7 +97,7 @@ def operation_1(message):
         complex1=complex(list_numbers[0])
         complex2 = complex(list_numbers[1])
         result = complex1+complex2
-    bot.reply_to(message, {str(result)})
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 
 def operation_2(message):
@@ -110,7 +111,7 @@ def operation_2(message):
         complex1=complex(list_numbers[0])
         complex2 = complex(list_numbers[1])
         result = complex1-complex2
-    bot.reply_to(message, str(result))
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 
 def operation_3(message):
@@ -127,7 +128,7 @@ def operation_3(message):
         complex1=complex(list_numbers[0])
         complex2 = complex(list_numbers[1])
         result = complex1/complex2
-    bot.reply_to(message, str(result))
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 def operation_4(message):
     global numbers
@@ -140,7 +141,7 @@ def operation_4(message):
         complex1=complex(list_numbers[0])
         complex2 = complex(list_numbers[1])
         result = complex1*complex2
-    bot.reply_to(message, str(result))
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 def operation_5(message):
     global numbers
@@ -152,7 +153,7 @@ def operation_5(message):
             result=str(list_numbers[0]%list_numbers[1])
         elif list_numbers[1]==0:
             result="Нельзя делить на ноль!"
-    bot.reply_to(message, str(result))
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 def operation_6(message):
     global numbers
@@ -164,10 +165,13 @@ def operation_6(message):
             result=str(list_numbers[0]//list_numbers[1])
         elif list_numbers[1]==0:
             result="Нельзя делить на ноль!"
-    bot.reply_to(message, str(result))
+    bot.send_message(message.chat.id, {str(result)})
     start(message)
 
 
-
+def log(message):
+    text=message.text
+    with open('log.txt', 'a+', encoding='UTF8') as file:
+         file.write('{}|{}|{}\n'.format(message.from_user.first_name,text,datetime.datetime.now()))
 
 bot.infinity_polling()
